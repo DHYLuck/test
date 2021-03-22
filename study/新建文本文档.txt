@@ -1,0 +1,101 @@
+<template>
+  <div class="dashboard-container">
+    <div class="dashboard-text">name: {{ name }}</div>
+    <div class="form-group">
+      <div class="label">
+        <label>上传图片</label>
+      </div>
+      <div>
+        <input type="file" name="file" id="file" value="123">
+        <p id="url">
+          <img width="200px" height="200px">
+        </p>
+        <input type="button" id="button" @click="tupian" value="上传">
+        <input type="button" @click="quxiao" value="取消">
+      </div>
+      </div>
+      <!-- <div class="form-group"> -->
+      <!-- <div class="label">
+        <label></label>
+        </div>
+      <div class="field">
+        <button class="button bg-main icon-check-aquare-o" type="button" @click="nadd()">提交</button>
+        </div> -->
+    <!-- </div> -->
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+export default {
+  name: 'Dashboard',
+  // computed: {
+  //   ...mapGetters([
+  //     'name'
+  //   ])
+  // },
+ data:{
+    banner1:{},
+  },
+  mounted(){},
+  methods:{
+    quxiao:function(){
+      var imgsrc=$("#imgsrc").attr("src");
+      var str_after=imgsrc.split("/");
+      var srt_img=str_after[str_after.length-1];
+      $.post("/model/deleteFile",{path:srt_img},function(data){
+        $("#url img").attr("src","/imctemp-rainy/no_img.png");
+        vm.navigation.imgsrc="";
+        alert(data);
+      })
+    },
+    tupian:function(){
+      var form = new FormData();
+      form.append("file",document.getElementById("file").file[0]);
+      $.ajax({
+        url: '/model/upload',
+        data:form,
+        Cache:false,
+        async:false,
+        type:"POST",
+        dataType:'json',
+        processData:false,
+        contentType:false,
+        success: function(data){
+          if(data){
+            var pic= "/imctemp-rainy/"+data.fileName;
+            $("#url img").attr("src",pic);
+            vm.banner1.pic=data.xfileName;
+          }else{
+            alert("失败");
+          }
+        },
+        error:function(er){alert(JSON.stringify(data));}
+      });
+    },
+    nadd:function(){
+      $.post("/home/badd",{banner1:JSON.stringify(vm.banner1)},function(data){
+        if(data.success==1){
+          alert(data.message);
+          window.location.href="/model/type";
+        }else{
+          alert(data.message);
+        }
+
+      })
+
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.dashboard {
+  &-container {
+    margin: 30px;
+  }
+  &-text {
+    font-size: 30px;
+    line-height: 46px;
+  }
+}
+</style>
